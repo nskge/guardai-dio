@@ -1,0 +1,17 @@
+name: GuardAI - regressao de seguranca
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  local-security-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testes SQL Injection em memoria
+        run: python -m unittest discover -s tests -v

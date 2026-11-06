@@ -1,0 +1,124 @@
+Relatório AppSec — SQLI-01: bypass de login por SQL Injection
+
+Resultado: bypass reproduzido na versão vulnerável; correção já existente em app.py revalidada para os casos testados. A suíte executou 9 testes, todos aprovados. Nenhum arquivo foi alterado e não houve acesso à rede ou a servidores.
+
+1. Objetivo, autorização e escopo
+
+Revisão didática do laboratório próprio e autorizado, limitada a:
+  labs/app_vulneravel.py
+  app.py
+  tests/test_login.py
+
+Foram lidas a persona, a skill local e a base de segurança solicitadas. Ambiente declarado: local, dados fictícios, SQLite em memória, nenhuma aplicação publicada e nenhum controle de produção. Os testes confirmam o uso de banco em memória em tests/test_login.py:23–27.
+
+2. Evidência estática e explicação do bypass
+
+Em labs/app_vulneravel.py:8–13, login concatena username e password à instrução SQL e executa o texto resultante. A entrada passa a poder modificar a estrutura da consulta.
+
+O caso de tests/test_login.py:34–37 envia:
+  username: alice' -- 
+  password: ***
+
+A consulta construída fica:
+  SELECT id, username FROM users WHERE username = 'alice' -- ' AND password = 'errada'
+
+A aspa após alice fecha o texto que representa o usuário. O -- inicia um comentário SQL; a condição da senha deixa de participar da consulta. O banco busca alice sem conferir a senha e a função retorna (1, 'alice').
+
+Isso é um bypass da decisão de login demonstrada pela função, não a criação de uma sessão nem evidência de comprometimento de um serviço.
+
+3. Vulnerabilidade e classificação
+
+CWE: CWE-89 — SQL Injection. A fraqueza é misturar entradas não confiáveis com a estrutura do comando SQL.
+
+MITRE ATT&CK: T1190 — Exploit Public-Facing Application não é aplicável ao cenário demonstrado. A associação seria condicional a uma aplicação exposta à internet e à exploração como caminho de acesso inicial. Essas condições não existem no laboratório informado.
+
+Classificações fundamentadas na skill e no conhecimento local; nenhuma fonte externa foi consultada, respeitando sua restrição de rede.
+
+4. Impacto, probabilidade e severidade — versão vulnerável
+
+Confidencialidade:
+  Retorno do identificador e nome de uma conta fictícia sem senha válida. Não foi demonstrada extração de outros dados.
+
+Integridade:
+  Violação da decisão de autenticação: credencial incorreta resulta em retorno de usuário. Não foi demonstrada alteração de registros.
+
+Disponibilidade:
+  Nenhum efeito demonstrado. O teste com DROP TABLE é executado contra a implementação corrigida e não comprova esse ataque na versão vulnerável.
+
+Probabilidade: alta dentro do laboratório.
+  O caminho é diretamente alcançável pela chamada da função, não há separação entre SQL e valores, e o bypass foi reproduzido.
+
+Impacto: baixo.
+  Dados fictícios, banco temporário em memória e consequência restrita ao exercício, sem propagação ou sessão demonstrada.
+
+Severidade: média.
+  Pela matriz qualitativa 3x3 do projeto: probabilidade alta × impacto baixo = média. Não é uma pontuação CVSS nem uma avaliação de um ambiente de produção.
+
+Confiança: alta para o achado local.
+  Há concordância entre o código observado e o teste que reproduz o comportamento.
+
+5. Correção já existente e motivo
+
+Em app.py:6–9, a estrutura SQL é fixa:
+  SELECT id, username FROM users WHERE username = ? AND password = ?
+
+Os valores são passados separadamente na tupla (username, password). Os marcadores ? representam dados; o conteúdo recebido não é incorporado como sintaxe SQL.
+
+Assim, alice' -- é procurado como um nome literal, em vez de remover a condição de senha. O mesmo mecanismo permite nomes legítimos com apóstrofo, como d'avila, sem precisar proibir aspas.
+
+A correção principal é a parametrização, não uma lista de palavras ou caracteres proibidos. Ela já estava presente; não apliquei alterações.
+
+6. Plano de regressão e evidência dinâmica
+
+Executado na raiz do projeto:
+  python -B -m unittest discover -s tests -v
+
+O -B evita gravar bytecode. A descoberta prévia encontrou apenas tests/test_login.py como arquivo Python em tests.
+
+Saída real:
+  Ran 9 tests in 0.015s
+  OK
+  Código de saída: 0
+
+Critérios verificados:
+  • Bypass aceito no controle vulnerável: linhas 34–37.
+  • Login legítimo aceito na versão corrigida: linhas 29–32.
+  • Senha incorreta rejeitada: linhas 39–40.
+  • Usuário inexistente rejeitado: linhas 42–43.
+  • Apóstrofo legítimo preservado: linhas 45–46.
+  • Três entradas de SQLi no usuário rejeitadas: linhas 48–51.
+  • Entrada de SQLi na senha rejeitada: linhas 53–54.
+  • Valores vazios rejeitados com os dados desta base: linhas 56–57.
+  • Entrada contendo segundo comando rejeitada, com tabela consultável e dois registros preservados: linhas 59–61.
+
+O teste da versão vulnerável passa justamente porque espera que o bypass funcione. Suíte aprovada não significa que os dois arquivos sejam seguros.
+
+7. Reavaliação após os testes
+
+Controle vulnerável:
+  Estado: vulnerabilidade reproduzida localmente.
+  Probabilidade alta; impacto baixo; severidade média.
+  Continua inseguro por intenção didática.
+
+app.py:
+  Estado: correção existente revalidada no escopo.
+  Probabilidade baixa para o vetor avaliado, pela separação efetiva entre instrução e valores, confirmada pelos testes.
+  Impacto contextual baixo, pois o ambiente continua sendo o mesmo laboratório.
+  Severidade residual baixa para esse vetor, pela matriz do projeto.
+  Confiança alta para os comportamentos testados, sem extrapolar para segurança global.
+
+Conclusão delimitada: o vetor de SQLi avaliado foi bloqueado nestes testes locais.
+
+8. Risco residual, lacunas e próximo passo
+
+As senhas fictícias continuam armazenadas e comparadas em texto claro. A parametrização resolve a mistura entre SQL e dados, não transforma esse exemplo em autenticação pronta para produção.
+
+Não foram avaliados sessões, autorização, recuperação de contas, transporte, implantação ou dependências. Não há evidência de invasão prévia, alteração arbitrária de dados ou indisponibilidade. Os testes não esgotam todas as entradas possíveis; por exemplo, rejeitar valores vazios nesta base não demonstra uma regra explícita de validação de campos.
+
+Responsável e prazo de eventual trabalho futuro: não definidos. Nenhuma correção adicional foi aplicada ou exigida para revalidar o vetor solicitado.
+
+Próximo passo didático: manter a cópia vulnerável isolada como controle e preservar esses testes de regressão.
+
+Para conferir o entendimento: por que o apóstrofo em d'avila pode ser aceito normalmente, enquanto alice' -- deixa de modificar a consulta parametrizada?
+
+session_id: local-d6249134674156ca7a4168ade99fb7c5d5e60b1374c31a2f8cf9388881ae4fd5

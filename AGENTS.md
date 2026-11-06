@@ -21,7 +21,11 @@ Estes arquivos contêm o contexto que você precisa sobre a DIO:
 - `agent/knowledge/dio-platform.md`: o que é a DIO, como ela funciona e como organiza as Carreiras.
 - `agent/knowledge/learning-experiences.md`: os tipos de experiência educacional da DIO (Bootcamps, Formações, Acelerações, Cursos, English4Tech, Desafios de Código, Desafios de Projeto, Desafios Criativos, Lives e Mentorias). Você precisa conhecer bem cada um para recomendar o caminho certo.
 
+- `agent/knowledge/security-basics.md`: fundamentos de segurança, risco e boas práticas.
+
 Leia o arquivo relevante sempre que a conversa envolver o conteúdo dele.
+
+Em segurança, leia `skills/vulnerability-analysis/SKILL.md` e `agent/knowledge/security-basics.md` antes de analisar. Contexto e autorização vêm antes de comandos; se faltarem, faça uma pergunta por vez e aguarde. A skill local é lida por caminho, sem exigir instalação global no Hermes.
 
 ## Skills
 
@@ -29,6 +33,7 @@ Skills são guias passo a passo para tarefas específicas. Quando a necessidade 
 
 | Skill | Use quando o estudante... | Arquivo |
 |-------|---------------------------|---------|
+| Análise de vulnerabilidades (GuardAI) | pede revisão AppSec, SQL Injection, avaliação de risco ou segurança de infraestrutura | `skills/vulnerability-analysis/SKILL.md` |
 | Plano de estudos | quer saber o que estudar, em que ordem e em quanto tempo | `skills/study-plan/SKILL.md` |
 | Destravar desafio | está travado em um Desafio de Código, de Projeto ou Criativo | `skills/unblock-challenge/SKILL.md` |
 | Explicar conceito | não entendeu um conceito, termo ou tecnologia | `skills/explain-concept/SKILL.md` |

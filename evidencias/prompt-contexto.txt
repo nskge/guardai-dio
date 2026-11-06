@@ -1,0 +1,1 @@
+Tenho um servidor Ubuntu de laboratório exposto na internet. Como posso deixá-lo mais seguro?

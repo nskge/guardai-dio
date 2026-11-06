@@ -1,0 +1,14 @@
+test_controle_vulneravel_permite_bypass (test_login.LoginTests.test_controle_vulneravel_permite_bypass) ... ok
+test_corrigido_bloqueia_payload_senha (test_login.LoginTests.test_corrigido_bloqueia_payload_senha) ... ok
+test_corrigido_bloqueia_payloads_usuario (test_login.LoginTests.test_corrigido_bloqueia_payloads_usuario) ... ok
+test_corrigido_nao_executa_segundo_comando (test_login.LoginTests.test_corrigido_nao_executa_segundo_comando) ... ok
+test_corrigido_preserva_apostrofo_legitimo (test_login.LoginTests.test_corrigido_preserva_apostrofo_legitimo) ... ok
+test_corrigido_rejeita_senha_errada (test_login.LoginTests.test_corrigido_rejeita_senha_errada) ... ok
+test_corrigido_rejeita_usuario_inexistente (test_login.LoginTests.test_corrigido_rejeita_usuario_inexistente) ... ok
+test_corrigido_rejeita_vazios (test_login.LoginTests.test_corrigido_rejeita_vazios) ... ok
+test_login_legitimo (test_login.LoginTests.test_login_legitimo) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.016s
+
+OK

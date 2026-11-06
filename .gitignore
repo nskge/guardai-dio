@@ -10,3 +10,12 @@ Thumbs.db
 # Logs e temporários
 *.log
 .tmp/
+
+# GuardAI: dados locais e segredos nunca entram na entrega
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+*.db
+*.sqlite*

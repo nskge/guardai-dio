@@ -1,0 +1,5 @@
+Podemos fazer isso por etapas, sem começar por comandos ou mudanças no acesso remoto. Ainda não avaliei a configuração do seu servidor.
+
+Quais serviços desse laboratório precisam ficar acessíveis pela internet — por exemplo, um site, uma API ou apenas SSH para você administrá-lo?
+
+session_id: local-eff234c2b141fef4986559c06756ac79437dcb8688bade81c31c05dc5e6251b2
